@@ -1,159 +1,98 @@
-# RentHub --- Rental Property Listing Application
+# RentHub — Rental Property Listing Application
 
-RentHub is an Angular web application for browsing rental properties and
-managing landlord property listings. It includes role-based navigation
-for tenants and landlords, property details, and property listing forms.
+RentHub is a responsive Angular web application designed to simplify the process of browsing rental properties and managing property listings. The application provides a dedicated experience for tenants and landlords, with role-based navigation, property details, authentication, and property listing management.
 
+The project demonstrates Angular standalone components, TypeScript, client-side routing, route guards, reusable services, form validation, and browser-based data persistence.
 
 ## Project Links
 
--   **GitHub Repository:** `[Add your GitHub repository URL here]`
--   **Live Application:** `[Add your deployed application URL here]`
+- **GitHub Repository:** https://github.com/Rida80503/RentHub
+- **Live Application:** https://ephemeral-platypus-b2dc0d.netlify.app/
 
 ## Features
 
--   Browse available rental properties.
--   View property details.
--   Register and log in as a user.
--   Separate tenant and landlord roles.
--   Protect landlord routes using Angular route guards.
--   Create and edit property listings through a property form.
--   Validate form fields before submission.
--   Store property and demo data in browser `localStorage`.
--   Display default property images when a listing has no photos.
--   Provide property comments and replies through the property service.
--   Responsive interface with accessible keyboard focus indicators.
+### Property Browsing
+- Browse available rental properties.
+- View individual property details.
+- Display default property images when listing photos are unavailable.
+- Access property information through dedicated listing and detail views.
 
-*Only list a feature as complete if it is implemented and working in the
-submitted version.*
+### Authentication and User Roles
+- Register a new user account.
+- Log in to the application.
+- Separate tenant and landlord experiences.
+- Use Angular route guards to restrict protected routes based on authentication and user roles.
+
+### Landlord Property Management
+- Access a dedicated landlord dashboard.
+- Create new property listings through a property form.
+- Edit existing property listings.
+- Validate form fields before submitting property information.
+
+### Data and User Experience
+- Store property and demo data in browser `localStorage`.
+- Manage property-related operations through an Angular service.
+- Support property comments and replies through the property service.
+- Provide a responsive interface with keyboard focus indicators.
+
+*Feature availability should be confirmed against the final deployed version before submission.*
 
 ## Technology Stack
 
--   **Framework:** Angular
--   **Language:** TypeScript
--   **Markup and styling:** HTML and CSS
--   **Routing:** Angular Router
--   **Testing:** Angular testing utilities
--   **Browser storage:** `localStorage`
+| Technology | Purpose |
+|---|---|
+| Angular | Frontend application framework |
+| TypeScript | Application logic and type safety |
+| HTML | Component templates and page structure |
+| CSS | Styling and responsive layouts |
+| Angular Router | Navigation and route management |
+| Angular Route Guards | Authentication and role-based route protection |
+| Angular Services | Property data and application logic |
+| localStorage | Browser-based persistence for demo data |
+| Angular Testing Utilities | Component and service testing |
+| Netlify | Frontend deployment and hosting |
+| Git and GitHub | Version control and source code hosting |
+
+## Application Architecture
+
+RentHub uses a feature-oriented Angular structure that separates authentication, property management, shared models, and application services.
+
+- **Core:** Authentication service and route guards.
+- **Features:** Login, registration, landlord dashboard, property listing, property details, and property form.
+- **Services:** Property data management and related operations.
+- **Shared Models:** TypeScript models for users and properties.
+- **Application Configuration:** Routes, providers, and application bootstrap configuration.
+
+This structure helps keep the application organized and makes individual features easier to maintain and extend.
 
 ## User Roles
 
 ### Tenant
-
--   Browse property listings.
--   Open property details.
--   Register and log in to the application.
+- Browse available rental properties.
+- View property details.
+- Register and log in to the application.
 
 ### Landlord
+- Access the landlord dashboard after authentication.
+- Create property listings.
+- Edit existing property listings.
 
--   Access the landlord dashboard after authentication.
--   Create new property listings.
--   Edit existing property listings.
-
-The application uses authentication and role guards to restrict landlord
-routes.
+Access to protected landlord routes is controlled by authentication and role guards.
 
 ## Demo Credentials
 
-Add the credentials for accounts that you have verified on the deployed
-application.
+Use the following demo account to explore the landlord features of RentHub.
 
-  --------------------------------------------------------------------------------------
-  Role                    Email / Username              Password
-  ----------------------- ----------------------------- --------------------------------
-  Landlord                `[landlord1@renthub.demo]`   `[DemoLandlord@123]`
-  --------------------------------------------------------------------------------------
+| Role      | Email / Username        | Password           |
+| Landlord | `landlord1@renthub.demo` | `DemoLandlord@123` |
 
-> Use dedicated demo accounts only. Do not include personal or reused
-> passwords in this README.
 
-## Running the Project Locally
-
-### Prerequisites
-
--   Node.js and npm installed.
--   Angular CLI compatible with the project version.
-
-### Setup
-
-1.  Clone the repository:
-
-    ``` bash
-    git clone [YOUR_GITHUB_REPOSITORY_URL]
-    ```
-
-2.  Open the project directory:
-
-    ``` bash
-    cd [YOUR_PROJECT_DIRECTORY]
-    ```
-
-3.  Install dependencies:
-
-    ``` bash
-    npm install
-    ```
-
-4.  Start the development server:
-
-    ``` bash
-    ng serve
-    ```
-
-5.  Open the local URL shown in the terminal (commonly
-    `http://localhost:4200/`).
-
-If the Angular CLI is not installed globally, you can run the project's
-local CLI using:
-
-``` bash
-npx ng serve
-```
-
-## Testing
-
-Unit tests are included for selected application components and
-services.
-
-Run the test suite with:
-
-``` bash
-ng test
-```
-
-Before submission, confirm the tests pass in your environment and update
-this section if needed. The project requirements call for unit tests
-covering at least one component, one service, and one module. If the
-application uses standalone Angular components rather than NgModules,
-describe the actual tested components/services accurately and confirm
-the evaluator's expectations.
-
-## Deployment
-
-Deploy the frontend to a free static hosting provider that supports
-Angular builds, such as GitHub Pages, Netlify, or Vercel.
-
-Typical production build command:
-
-``` bash
-ng build
-```
-
-After deployment, add the public URL under **Project Links** above and
-verify that: - The home page loads. - Registration and login work with
-the demo accounts. - Route guards behave correctly for each role. -
-Property listing and detail pages work. - The application works on
-mobile and desktop screen sizes.
 
 ## Project Structure
 
-The application is organized by feature and responsibility. The main
-areas include:
-
-RENTHUB/
-│
+```text
+renthub/
 ├── public/
-│
 ├── src/
 │   ├── app/
 │   │   ├── core/
@@ -161,104 +100,205 @@ RENTHUB/
 │   │   │   ├── auth.service.ts
 │   │   │   ├── auth.service.spec.ts
 │   │   │   └── role.guard.ts
-│   │   │
 │   │   ├── features/
 │   │   │   ├── auth/
 │   │   │   │   ├── login/
-│   │   │   │   │   ├── login.ts
-│   │   │   │   │   ├── login.html
-│   │   │   │   │   ├── login.css
-│   │   │   │   │   └── login.spec.ts
-│   │   │   │   │
 │   │   │   │   └── register/
-│   │   │   │       ├── register.ts
-│   │   │   │       ├── register.html
-│   │   │   │       ├── register.css
-│   │   │   │       └── register.spec.ts
-│   │   │   │
 │   │   │   ├── landlord/
 │   │   │   │   └── landlord-dashboard/
-│   │   │   │       ├── landlord-dashboard.ts
-│   │   │   │       ├── landlord-dashboard.html
-│   │   │   │       ├── landlord-dashboard.css
-│   │   │   │       └── landlord-dashboard.spec.ts
-│   │   │   │
 │   │   │   └── properties/
 │   │   │       ├── home/
-│   │   │       │   ├── home.ts
-│   │   │       │   ├── home.html
-│   │   │       │   ├── home.css
-│   │   │       │   └── home.spec.ts
-│   │   │       │
 │   │   │       ├── property-details/
-│   │   │       │   ├── property-details.ts
-│   │   │       │   ├── property-details.html
-│   │   │       │   ├── property-details.css
-│   │   │       │   └── property-details.spec.ts
-│   │   │       │
 │   │   │       └── property-form/
-│   │   │           ├── property-form.ts
-│   │   │           ├── property-form.html
-│   │   │           ├── property-form.css
-│   │   │           └── property-form.spec.ts
-│   │   │
 │   │   ├── services/
 │   │   │   ├── property.service.ts
 │   │   │   └── property.service.spec.ts
-│   │   │
 │   │   ├── shared/
 │   │   │   └── models/
 │   │   │       ├── property.model.ts
 │   │   │       └── user.model.ts
-│   │   │
 │   │   ├── app.config.ts
 │   │   ├── app.routes.ts
 │   │   ├── app.ts
 │   │   ├── app.html
 │   │   └── app.spec.ts
-│   │
 │   ├── index.html
 │   ├── main.ts
 │   └── styles.css
-│
-├── README.md
 ├── angular.json
 ├── package.json
 ├── package-lock.json
 ├── tsconfig.json
 └── .gitignore
+```
 
 ## Folder Structure Overview
 
-The following table describes the main folders and configuration files used in the RentHub application.
-
 | Folder / File | Purpose |
 |---|---|
-| `core/` | Contains authentication services and route guards for access control. |
-| `features/auth/` | Contains the login and registration components. |
-| `features/landlord/` | Contains the landlord dashboard for managing property listings. |
-| `features/properties/` | Contains the home page, property details, and property form components. |
-| `services/` | Contains services for property data management and CRUD operations. |
-| `shared/models/` | Contains TypeScript interfaces and data types for users and properties. |
-| `app.routes.ts` | Defines application routes and navigation between components. |
-| `app.config.ts` | Configures application-wide providers and Angular settings. |
-| `README.md` | Provides project documentation, setup instructions, repository links, deployment links, and demo credentials. |
-## Notes
+| `public/` | Contains static assets served by the application. |
+| `src/app/core/` | Contains authentication logic, the authentication service, and route guards. |
+| `src/app/features/auth/` | Contains login and registration components for user authentication. |
+| `src/app/features/landlord/` | Contains the landlord dashboard for managing property listings. |
+| `src/app/features/properties/home/` | Displays the home page and available rental properties. |
+| `src/app/features/properties/property-details/` | Displays detailed information about an individual property. |
+| `src/app/features/properties/property-form/` | Contains the form used to create and edit property listings. |
+| `src/app/services/` | Contains services for property data management and related operations. |
+| `src/app/shared/models/` | Defines TypeScript models and interfaces for users and properties. |
+| `src/app/app.routes.ts` | Defines application routes and navigation between features. |
+| `src/app/app.config.ts` | Configures application-wide providers and Angular settings. |
+| `src/app/app.ts` | Contains the root application component logic. |
+| `src/app/app.html` | Contains the root application component template. |
+| `src/app/app.css` | Contains styling for the root application component. |
+| `src/main.ts` | Bootstraps the Angular application. |
+| `src/styles.css` | Contains global application styles. |
+| `angular.json` | Configures Angular build, development server, and testing settings. |
+| `package.json` | Defines project dependencies and npm scripts. |
+| `package-lock.json` | Records the resolved dependency versions for consistent installations. |
+| `tsconfig.json` | Contains TypeScript compiler configuration. |
+| `.gitignore` | Specifies files and directories Git should ignore. |
+| `README.md` | Documents project features, setup, architecture, testing, and deployment. |
 
--   Property and comment data are stored in browser `localStorage` in
-    the current implementation; this is suitable for a demo but is not a
-    replacement for a secure production backend.
--   Demo properties may be seeded automatically when the application
-    first runs.
--   Update this README to reflect the final deployed version and the
-    features you have personally tested.
+### Key Design Notes
 
-## Submission Checklist
+- **Feature-based organization:** Authentication, landlord functionality, and property pages are separated into their own feature folders.
+- **Separation of responsibilities:** Services manage application data operations, while shared models define data structures.
+- **Route protection:** Authentication and role guards help restrict access to protected routes.
+- **Standalone Angular structure:** The application uses standalone-style configuration and routing rather than requiring a traditional root NgModule.
 
--   [ ] GitHub repository URL added.
--   [ ] Deployed application URL added and tested.
--   [ ] Demo tenant credentials verified.
--   [ ] Demo landlord credentials verified.
--   [ ] Unit tests run and results checked.
--   [ ] README saved in the repository root.
--   [ ] Any bonus features attempted are listed accurately.
+
+## Getting Started
+
+### Prerequisites
+
+Install the following tools before running the application:
+
+- Node.js and npm
+- Git
+- A compatible Angular CLI (or use the project's local CLI through `npx`)
+
+### Installation
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/Rida80503/RentHub.git
+```
+
+**2. Open the project directory**
+
+```bash
+cd RentHub
+```
+
+**3. Install dependencies**
+
+```bash
+npm install
+```
+
+**4. Start the development server**
+
+```bash
+npx ng serve
+```
+
+**5. Open the application**
+
+Visit:
+
+http://localhost:4200/
+
+The development server watches for changes and rebuilds the application as you update the source files.
+
+## Build and Testing
+
+### Production Build
+
+Generate an optimized production build:
+
+```bash
+npm run build
+```
+
+The Angular build output is generated under:
+
+```text
+dist/renthub/browser/
+```
+
+### Unit Tests
+
+The repository includes Angular component and service test files.
+
+Run the project's test command:
+
+```bash
+npx ng test
+```
+
+Confirm the test results in your environment before reporting a passing test count in a submission.
+
+## Deployment
+
+RentHub is deployed on Netlify and connected to the GitHub repository.
+
+- **Hosting platform:** Netlify
+- **Source branch:** `main`
+- **Build command:** `npm run build`
+- **Publish directory:** `dist/renthub/browser`
+
+### Deployment Verification
+
+After deployment, verify that:
+
+- The home page loads correctly.
+- Registration and login work as expected.
+- Tenant and landlord navigation behaves correctly.
+- Property details and listing forms function correctly.
+- Refreshing a nested route does not produce a 404 error.
+- The layout remains usable on desktop and mobile devices.
+
+Live application: https://ephemeral-platypus-b2dc0d.netlify.app/
+
+## Demo Accounts
+
+Add dedicated demo accounts here only after creating and testing them on the deployed application.
+
+| Role | Email / Username | Password |
+|---|---|---|
+| Tenant | Add verified demo account | Add verified demo password |
+| Landlord | Add verified demo account | Add verified demo password |
+
+Do not publish personal credentials or passwords reused for other services.
+
+## Current Limitations
+
+- Property and demo data are stored in browser `localStorage`.
+- Browser-based storage is local to the user's browser and is not a shared database.
+- A production-ready multi-user application would require a secure backend, persistent database, and server-side authentication and authorization.
+
+These limitations should be considered when evaluating the application for real-world rental management.
+
+## Future Improvements
+
+Potential improvements include:
+
+- Integrating a backend API and database.
+- Adding property image uploads.
+- Introducing property search, filtering, and sorting.
+- Implementing secure server-side authentication and authorization.
+- Adding automated end-to-end tests.
+- Improving accessibility and mobile usability.
+
+## Author and Project Information
+
+**Project:** RentHub — Rental Property Listing Application  
+**Framework:** Angular  
+**Language:** TypeScript  
+**Repository:** https://github.com/Rida80503/RentHub  
+**Live Demo:** https://ephemeral-platypus-b2dc0d.netlify.app/
+
+---
+
+*This README describes the current application structure and intended functionality. Update it whenever the implementation, testing results, demo accounts, or deployment configuration changes.*
