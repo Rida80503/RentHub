@@ -1,3 +1,4 @@
+
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 
@@ -7,30 +8,31 @@ import { UserRole } from '../shared/models/user.model';
 /**
  * Protects routes based on the authenticated user's role.
  *
- * Checks whether the user is logged in and whether their role matches
- * the role specified in the route's data. Unauthenticated users are
- * redirected to the login page, while users with the wrong role are
- * redirected to an appropriate route.
- *
- * @param route - The route being activated, including its role metadata.
- * @returns True if access is allowed; otherwise, a UrlTree for redirection.
+ * Supports:
+ * - Role-specific routes using data.role
+ * - Tenant-only routes using data.tenantOnly
  */
 export const roleGuard: CanActivateFn = route => {
-  // Inject the authentication service to retrieve the current user.
   const authService = inject(AuthService);
-
-  // Inject the router to handle redirects when access is denied.
   const router = inject(Router);
 
-  // Get the currently authenticated user.
   const user = authService.getCurrentUser();
-
-  // Read the role required by this route, if one is configured.
   const expectedRole = route.data['role'] as UserRole | undefined;
+  const tenantOnly = route.data['tenantOnly'] === true;
 
-  // Redirect unauthenticated users to the login page.
+  // Allow logged-out users to access public pages.
+  // Protected routes should also use authGuard.
   if (!user) {
-    return router.createUrlTree(['/login']);
+    if (expectedRole || tenantOnly) {
+      return router.createUrlTree(['/login']);
+    }
+
+    return true;
+  }
+
+  // Block landlords from tenant-only pages.
+  if (tenantOnly && user.role !== 'tenant') {
+    return router.createUrlTree(['/access-denied']);
   }
 
   // Redirect users whose role does not match the route requirement.
@@ -41,6 +43,5 @@ export const roleGuard: CanActivateFn = route => {
     return router.createUrlTree([correctRoute]);
   }
 
-  // Allow navigation if authentication and role checks pass.
   return true;
 };
