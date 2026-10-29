@@ -9,9 +9,12 @@
       </a>
 
       <div class="flex items-center gap-3">
-        <a routerLink="/" class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold hover:bg-slate-100">
+        <button
+          type="button"
+          (click)="goBackToListings()"
+          class="rounded-xl border border-slate-200 px-4 py-2 text-sm font-semibold hover:bg-slate-100">
           ← Back to listings
-        </a>
+        </button>
 
         <button
           *ngIf="isLoggedIn"

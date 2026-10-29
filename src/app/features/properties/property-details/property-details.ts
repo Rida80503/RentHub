@@ -292,6 +292,14 @@ export class PropertyDetails implements OnInit {
     this.loadComments();
     this.successMessage = 'Your reply has been posted.';
   }
+  
+  goBackToListings(): void {
+    if (this.currentUser?.role === 'landlord') {
+      this.router.navigate(['/landlord/dashboard']);
+    } else {
+      this.router.navigate(['/']);
+    }
+  }
 
   /** Logs out the current user and redirects to the home page. */
   logout(): void {
