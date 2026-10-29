@@ -1,0 +1,981 @@
+
+<div class="min-h-screen bg-slate-50 text-slate-800">
+  <!-- Header -->
+  <header class="sticky top-0 z-30 border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <a routerLink="/" class="text-2xl font-black tracking-tight text-blue-700">
+        RentHub<span class="text-slate-900">.</span>
+      </a>
+
+      <a
+        routerLink="/landlord/dashboard"
+        class="rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-bold transition hover:bg-slate-100"
+      >
+        ← Dashboard
+      </a>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <!-- Page heading -->
+    <section class="mb-8">
+      <p class="text-sm font-bold uppercase tracking-widest text-blue-700">
+        Landlord workspace
+      </p>
+
+      <h1 class="mt-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
+        {{ isEditMode ? 'Edit Property' : 'List Your Property' }}
+      </h1>
+
+      <p class="mt-3 max-w-2xl text-base leading-7 text-slate-500">
+        Add your property details, rental terms, amenities and contact
+        information. Review your listing before submitting it.
+      </p>
+    </section>
+
+    <!-- Error message -->
+    <div
+      *ngIf="errorMessage"
+      role="alert"
+      class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <!-- Progress indicators -->
+    <section class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div
+        class="rounded-2xl border p-5"
+        [ngClass]="showPreview
+          ? 'border-green-200 bg-green-50'
+          : 'border-blue-200 bg-blue-50'"
+      >
+        <div class="flex items-center gap-3">
+          <span
+            class="flex h-10 w-10 items-center justify-center rounded-full font-black text-white"
+            [ngClass]="showPreview ? 'bg-green-600' : 'bg-blue-700'"
+          >
+            1
+          </span>
+
+          <div>
+            <p class="font-bold text-slate-900">Property details</p>
+            <p class="mt-1 text-sm text-slate-500">Complete the form</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="rounded-2xl border p-5"
+        [ngClass]="showPreview
+          ? 'border-blue-200 bg-blue-50'
+          : 'border-slate-200 bg-white'"
+      >
+        <div class="flex items-center gap-3">
+          <span
+            class="flex h-10 w-10 items-center justify-center rounded-full font-black"
+            [ngClass]="showPreview
+              ? 'bg-blue-700 text-white'
+              : 'bg-slate-100 text-slate-500'"
+          >
+            2
+          </span>
+
+          <div>
+            <p class="font-bold text-slate-900">Preview & submit</p>
+            <p class="mt-1 text-sm text-slate-500">Review before saving</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main reactive form -->
+    <form
+      [formGroup]="propertyForm"
+      (ngSubmit)="onSubmit()"
+      novalidate
+      class="space-y-7"
+    >
+      <!-- 1. Basic property information -->
+      <section
+        class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+        [class.hidden]="showPreview"
+      >
+        <div class="border-b border-slate-100 px-6 py-5 sm:px-8">
+          <h2 class="text-xl font-extrabold text-slate-900">
+            1. Basic Property Information
+          </h2>
+          <p class="mt-1 text-sm text-slate-500">
+            Enter a descriptive property name and type.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 sm:p-8">
+          <div class="sm:col-span-2">
+            <label for="title" class="mb-2 block text-sm font-bold">
+              Property Name <span class="text-red-500">*</span>
+            </label>
+
+            <input
+              id="title"
+              type="text"
+              formControlName="title"
+              maxlength="100"
+              placeholder="e.g. Green Valley Apartment 101"
+              autocomplete="off"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              [class.border-red-500]="controls.title.touched && controls.title.invalid"
+            />
+
+            <div
+              *ngIf="controls.title.touched && controls.title.invalid"
+              class="mt-2 space-y-1 text-sm text-red-600"
+            >
+              <p *ngIf="controls.title.errors?.['required']">
+                Property name is required.
+              </p>
+              <p *ngIf="controls.title.errors?.['minlength']">
+                Property name must contain at least 3 characters.
+              </p>
+              <p *ngIf="controls.title.errors?.['maxlength']">
+                Property name cannot exceed 100 characters.
+              </p>
+              <p *ngIf="controls.title.errors?.['lettersRequired']">
+                Property name must contain letters; numbers alone are not allowed.
+              </p>
+              <p *ngIf="controls.title.errors?.['invalidCharacters']">
+                Property name contains unsupported characters.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label for="propertyType" class="mb-2 block text-sm font-bold">
+              Property Type <span class="text-red-500">*</span>
+            </label>
+
+            <select
+              id="propertyType"
+              formControlName="propertyType"
+              class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            >
+              <option value="Apartment">Apartment</option>
+              <option value="Studio">Studio</option>
+              <option value="Room">Room</option>
+              <option value="House">House</option>
+            </select>
+          </div>
+
+          <div class="flex items-center">
+            <label
+              class="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-slate-200 p-4"
+            >
+              <input
+                type="checkbox"
+                formControlName="sharedProperty"
+                class="h-5 w-5 accent-blue-700"
+              />
+              <span>
+                <span class="block text-sm font-bold">Shared property</span>
+                <span class="mt-1 block text-xs text-slate-500">
+                  Tenants share the property.
+                </span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Property location -->
+      <section
+        class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+        [class.hidden]="showPreview"
+      >
+        <div class="border-b border-slate-100 px-6 py-5 sm:px-8">
+          <h2 class="text-xl font-extrabold text-slate-900">
+            2. Property Location
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 sm:p-8">
+          <div class="sm:col-span-2">
+            <label for="streetAddress" class="mb-2 block text-sm font-bold">
+              Street Address <span class="text-red-500">*</span>
+            </label>
+
+            <input
+              id="streetAddress"
+              type="text"
+              formControlName="streetAddress"
+              maxlength="200"
+              placeholder="e.g. House 12, Sector 22"
+              autocomplete="street-address"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              [class.border-red-500]="controls.streetAddress.touched && controls.streetAddress.invalid"
+            />
+
+            <div
+              *ngIf="controls.streetAddress.touched && controls.streetAddress.invalid"
+              class="mt-2 space-y-1 text-sm text-red-600"
+            >
+              <p *ngIf="controls.streetAddress.errors?.['required']">
+                Street address is required.
+              </p>
+              <p *ngIf="controls.streetAddress.errors?.['lettersRequired']">
+                Address must contain letters, not only numbers.
+              </p>
+              <p *ngIf="controls.streetAddress.errors?.['invalidCharacters']">
+                Address contains unsupported characters.
+              </p>
+              <p *ngIf="controls.streetAddress.errors?.['maxlength']">
+                Address cannot exceed 200 characters.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label for="location" class="mb-2 block text-sm font-bold">
+              City / Location <span class="text-red-500">*</span>
+            </label>
+
+            <input
+              id="location"
+              type="text"
+              formControlName="location"
+              maxlength="100"
+              placeholder="e.g. Sector 22, Gurugram"
+              autocomplete="address-level2"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              [class.border-red-500]="controls.location.touched && controls.location.invalid"
+            />
+
+            <div
+              *ngIf="controls.location.touched && controls.location.invalid"
+              class="mt-2 space-y-1 text-sm text-red-600"
+            >
+              <p *ngIf="controls.location.errors?.['required']">
+                Location is required.
+              </p>
+              <p *ngIf="controls.location.errors?.['lettersRequired']">
+                Location must contain letters, not only numbers.
+              </p>
+              <p *ngIf="controls.location.errors?.['invalidCharacters']">
+                Location contains unsupported characters.
+              </p>
+              <p *ngIf="controls.location.errors?.['maxlength']">
+                Location cannot exceed 100 characters.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label for="squareFeet" class="mb-2 block text-sm font-bold">
+              Property Area (sq. ft.)
+            </label>
+
+            <input
+              id="squareFeet"
+              type="number"
+              formControlName="squareFeet"
+              min="1"
+              placeholder="e.g. 950"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            />
+
+            <p
+              *ngIf="controls.squareFeet.touched && controls.squareFeet.errors?.['min']"
+              class="mt-2 text-sm text-red-600"
+            >
+              Area must be greater than zero.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Rent and lease terms -->
+      <section
+        class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+        [class.hidden]="showPreview"
+      >
+        <div class="border-b border-slate-100 px-6 py-5 sm:px-8">
+          <h2 class="text-xl font-extrabold text-slate-900">
+            3. Rent & Lease Terms
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 sm:p-8">
+          <div>
+            <label for="rent" class="mb-2 block text-sm font-bold">
+              Rent Amount (₹) *
+            </label>
+
+            <input
+              id="rent"
+              type="number"
+              formControlName="rent"
+              min="1"
+              placeholder="e.g. 20000"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              [class.border-red-500]="controls.rent.touched && controls.rent.invalid"
+            />
+
+            <div
+              *ngIf="controls.rent.touched && controls.rent.invalid"
+              class="mt-2 space-y-1 text-sm text-red-600"
+            >
+              <p *ngIf="controls.rent.errors?.['required']">
+                Rent amount is required.
+              </p>
+              <p *ngIf="controls.rent.errors?.['min']">
+                Rent must be greater than zero.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label for="leaseType" class="mb-2 block text-sm font-bold">
+              Lease Type *
+            </label>
+
+            <select
+              id="leaseType"
+              formControlName="leaseType"
+              class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            >
+              <option value="long-term">Long term</option>
+              <option value="short-term">Short term</option>
+              <option value="both">Long term and short term</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="priceMode" class="mb-2 block text-sm font-bold">
+              Rent Mode *
+            </label>
+
+            <select
+              id="priceMode"
+              formControlName="priceMode"
+              class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            >
+              <option value="per-month">Rent per month</option>
+              <option value="utilities-included">Utilities included</option>
+            </select>
+          </div>
+
+          <div class="flex items-center">
+            <label
+              class="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-slate-200 p-4"
+            >
+              <input
+                type="checkbox"
+                formControlName="negotiable"
+                class="h-5 w-5 accent-blue-700"
+              />
+              <span class="text-sm font-bold">Rent is negotiable</span>
+            </label>
+          </div>
+
+          <div>
+            <label for="bedrooms" class="mb-2 block text-sm font-bold">
+              Bedrooms *
+            </label>
+
+            <input
+              id="bedrooms"
+              type="number"
+              formControlName="bedrooms"
+              min="0"
+              max="50"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            />
+
+            <p
+              *ngIf="controls.bedrooms.touched && controls.bedrooms.invalid"
+              class="mt-2 text-sm text-red-600"
+            >
+              Enter a number from 0 to 50.
+            </p>
+          </div>
+
+          <div>
+            <label for="bathrooms" class="mb-2 block text-sm font-bold">
+              Bathrooms *
+            </label>
+
+            <input
+              id="bathrooms"
+              type="number"
+              formControlName="bathrooms"
+              min="0"
+              max="50"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            />
+
+            <p
+              *ngIf="controls.bathrooms.touched && controls.bathrooms.invalid"
+              class="mt-2 text-sm text-red-600"
+            >
+              Enter a number from 0 to 50.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Preferences and amenities -->
+      <section
+        class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+        [class.hidden]="showPreview"
+      >
+        <div class="border-b border-slate-100 px-6 py-5 sm:px-8">
+          <h2 class="text-xl font-extrabold text-slate-900">
+            4. Preferences & Amenities
+          </h2>
+        </div>
+
+        <div class="space-y-7 p-6 sm:p-8">
+          <label
+            class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4"
+          >
+            <input
+              type="checkbox"
+              formControlName="furnished"
+              class="mt-1 h-5 w-5 accent-blue-700"
+            />
+            <span>
+              <span class="block font-bold">Furnished property</span>
+              <span class="mt-1 block text-sm text-slate-500">
+                Select if furniture is provided.
+              </span>
+            </span>
+          </label>
+
+          <div>
+            <p class="text-sm font-bold">Vegetarian Preference *</p>
+
+            <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <label
+                class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 p-4"
+              >
+                <input
+                  type="radio"
+                  formControlName="vegetarianPreference"
+                  value="yes"
+                  class="h-4 w-4 accent-blue-700"
+                />
+                <span class="text-sm font-semibold">Vegetarian only</span>
+              </label>
+
+              <label
+                class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 p-4"
+              >
+                <input
+                  type="radio"
+                  formControlName="vegetarianPreference"
+                  value="no"
+                  class="h-4 w-4 accent-blue-700"
+                />
+                <span class="text-sm font-semibold">Non-vegetarian allowed</span>
+              </label>
+
+              <label
+                class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 p-4"
+              >
+                <input
+                  type="radio"
+                  formControlName="vegetarianPreference"
+                  value="no-preference"
+                  class="h-4 w-4 accent-blue-700"
+                />
+                <span class="text-sm font-semibold">No preference</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <p class="text-sm font-bold">Amenities</p>
+            <p class="mt-1 text-sm text-slate-500">
+              Select all available facilities.
+            </p>
+
+            <div
+              formGroupName="amenities"
+              class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3"
+            >
+              <label
+                *ngFor="let amenity of amenityOptions"
+                class="flex cursor-pointer items-center gap-3 rounded-xl border border-slate-200 p-3 hover:bg-slate-50"
+              >
+                <input
+                  type="checkbox"
+                  [formControlName]="amenity"
+                  class="h-4 w-4 accent-blue-700"
+                />
+                <span class="text-sm font-medium">{{ amenity }}</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Description and photos -->
+      <section
+        class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+        [class.hidden]="showPreview"
+      >
+        <div class="border-b border-slate-100 px-6 py-5 sm:px-8">
+          <h2 class="text-xl font-extrabold text-slate-900">
+            5. Description & Photos
+          </h2>
+        </div>
+
+        <div class="space-y-6 p-6 sm:p-8">
+          <div>
+            <label for="description" class="mb-2 block text-sm font-bold">
+              Property Description *
+            </label>
+
+            <textarea
+              id="description"
+              formControlName="description"
+              rows="6"
+              maxlength="2000"
+              placeholder="Describe the property, nearby facilities and rental conditions..."
+              class="w-full resize-y rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              [class.border-red-500]="controls.description.touched && controls.description.invalid"
+            ></textarea>
+
+            <div
+              *ngIf="controls.description.touched && controls.description.invalid"
+              class="mt-2 space-y-1 text-sm text-red-600"
+            >
+              <p *ngIf="controls.description.errors?.['required']">
+                Description is required.
+              </p>
+              <p *ngIf="controls.description.errors?.['whitespace']">
+                Description cannot contain only spaces.
+              </p>
+              <p *ngIf="controls.description.errors?.['minlength']">
+                Description must contain at least 10 characters.
+              </p>
+              <p *ngIf="controls.description.errors?.['maxlength']">
+                Description cannot exceed 2000 characters.
+              </p>
+            </div>
+
+            <p class="mt-2 text-right text-xs text-slate-400">
+              {{ controls.description.value?.length || 0 }}/2000
+            </p>
+          </div>
+
+          <div>
+            <label for="photosText" class="mb-2 block text-sm font-bold">
+              Property Photo URLs
+            </label>
+
+            <textarea
+              id="photosText"
+              formControlName="photosText"
+              rows="4"
+              placeholder="https://example.com/property-image.jpg"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+            ></textarea>
+
+            <p class="mt-2 text-sm leading-6 text-slate-500">
+              Enter one HTTP or HTTPS photo URL per line. Leave blank to use
+              the default image.
+            </p>
+
+            <p
+              *ngIf="controls.photosText.touched && !arePhotoUrlsValidForDisplay()"
+              class="mt-2 text-sm text-red-600"
+            >
+              One or more photo URLs are invalid. Use complete HTTP or HTTPS URLs.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Contact details -->
+      <section
+        class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm"
+        [class.hidden]="showPreview"
+      >
+        <div class="border-b border-slate-100 px-6 py-5 sm:px-8">
+          <h2 class="text-xl font-extrabold text-slate-900">
+            6. Contact Details
+          </h2>
+          <p class="mt-1 text-sm text-slate-500">
+            Enter valid contact information for tenants.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 p-6 sm:grid-cols-2 sm:p-8">
+          <div class="sm:col-span-2">
+            <label for="contactName" class="mb-2 block text-sm font-bold">
+              Contact Name *
+            </label>
+
+            <input
+              id="contactName"
+              type="text"
+              formControlName="contactName"
+              maxlength="80"
+              placeholder="Full name"
+              autocomplete="name"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              [class.border-red-500]="controls.contactName.touched && controls.contactName.invalid"
+            />
+
+            <div
+              *ngIf="controls.contactName.touched && controls.contactName.invalid"
+              class="mt-2 space-y-1 text-sm text-red-600"
+            >
+              <p *ngIf="controls.contactName.errors?.['required']">
+                Contact name is required.
+              </p>
+              <p *ngIf="controls.contactName.errors?.['minlength']">
+                Contact name must contain at least 2 characters.
+              </p>
+              <p *ngIf="controls.contactName.errors?.['maxlength']">
+                Contact name cannot exceed 80 characters.
+              </p>
+              <p *ngIf="controls.contactName.errors?.['pattern']">
+                Use letters, spaces, apostrophes or hyphens only.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label for="contactEmail" class="mb-2 block text-sm font-bold">
+              Email Address *
+            </label>
+
+            <input
+              id="contactEmail"
+              type="email"
+              formControlName="contactEmail"
+              placeholder="name@example.com"
+              autocomplete="email"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              [class.border-red-500]="controls.contactEmail.touched && controls.contactEmail.invalid"
+            />
+
+            <div
+              *ngIf="controls.contactEmail.touched && controls.contactEmail.invalid"
+              class="mt-2 space-y-1 text-sm text-red-600"
+            >
+              <p *ngIf="controls.contactEmail.errors?.['required']">
+                Email address is required.
+              </p>
+              <p *ngIf="controls.contactEmail.errors?.['pattern']">
+                Enter a valid email in the format name@example.com.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label for="contactPhone" class="mb-2 block text-sm font-bold">
+              Phone Number *
+            </label>
+
+            <input
+              id="contactPhone"
+              type="tel"
+              formControlName="contactPhone"
+              maxlength="10"
+              inputmode="numeric"
+              placeholder="9876543210"
+              autocomplete="tel-national"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              [class.border-red-500]="controls.contactPhone.touched && controls.contactPhone.invalid"
+            />
+
+            <div
+              *ngIf="controls.contactPhone.touched && controls.contactPhone.invalid"
+              class="mt-2 space-y-1 text-sm text-red-600"
+            >
+              <p *ngIf="controls.contactPhone.errors?.['required']">
+                Phone number is required.
+              </p>
+              <p *ngIf="controls.contactPhone.errors?.['pattern']">
+                Enter exactly 10 digits, starting with 6, 7, 8 or 9.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cancel and preview actions -->
+      <div
+        *ngIf="!showPreview"
+        class="flex w-full items-center justify-end gap-3 border-t border-slate-200 pt-6 sm:gap-4"
+      >
+        <button
+          type="button"
+          (click)="cancelForm()"
+          class="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-100 sm:px-8 sm:text-base"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          (click)="previewProperty()"
+          class="inline-flex min-h-12 items-center justify-center rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white shadow-md transition hover:bg-blue-800 sm:px-8 sm:text-base"
+        >
+          Preview Listing →
+        </button>
+      </div>
+
+      <!-- Listing preview -->
+      <section
+        *ngIf="showPreview"
+        id="listing-preview"
+        class="overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-lg"
+      >
+        <div class="border-b border-blue-100 bg-blue-50 px-6 py-5 sm:px-8">
+          <p class="text-sm font-bold uppercase tracking-widest text-blue-700">
+            Listing preview
+          </p>
+
+          <h2 class="mt-2 text-2xl font-black text-slate-900">
+            Review your property
+          </h2>
+
+          <p class="mt-2 text-sm text-slate-600">
+            Check all details before submitting.
+          </p>
+        </div>
+
+        <div class="space-y-6 p-6 sm:p-8">
+          <!-- Main photo -->
+          <img
+            [src]="photoUrls.length ? photoUrls[0] : defaultPropertyImage"
+            [alt]="controls.title.value || 'Property preview'"
+            class="h-56 w-full rounded-2xl object-cover sm:h-80"
+            (error)="$any($event.target).src = defaultPropertyImage"
+          />
+
+          <!-- Name and location -->
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-400">
+              Property Name
+            </p>
+
+            <h3 class="mt-2 break-words text-2xl font-black text-slate-900">
+              {{ controls.title.value }}
+            </h3>
+
+            <p class="mt-2 break-words text-sm text-slate-500">
+              📍 {{ controls.streetAddress.value }}, {{ controls.location.value }}
+            </p>
+          </div>
+
+          <!-- Rent, type and lease -->
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div class="rounded-2xl bg-blue-50 p-5">
+              <p class="text-sm font-semibold text-slate-500">Rent</p>
+              <p class="mt-2 text-2xl font-black text-blue-800">
+                ₹{{ controls.rent.value | number }}
+              </p>
+              <p class="mt-1 text-xs text-slate-500">
+                {{
+                  controls.priceMode.value === 'utilities-included'
+                    ? 'Utilities included'
+                    : 'Per month'
+                }}
+              </p>
+            </div>
+
+            <div class="rounded-2xl bg-slate-50 p-5">
+              <p class="text-sm font-semibold text-slate-500">Property type</p>
+              <p class="mt-2 text-xl font-black">
+                {{ controls.propertyType.value }}
+              </p>
+            </div>
+
+            <div class="rounded-2xl bg-slate-50 p-5">
+              <p class="text-sm font-semibold text-slate-500">Lease type</p>
+              <p class="mt-2 text-xl font-black">
+                {{ controls.leaseType.value }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div>
+            <h3 class="text-lg font-extrabold">Description</h3>
+            <p class="mt-2 whitespace-pre-line break-words text-sm leading-7 text-slate-600">
+              {{ controls.description.value }}
+            </p>
+          </div>
+
+          <!-- Property details -->
+          <div>
+            <h3 class="text-lg font-extrabold">Property details</h3>
+
+            <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div class="rounded-xl bg-slate-50 p-4">
+                <p class="text-xs text-slate-500">Bedrooms</p>
+                <p class="mt-1 text-lg font-black">
+                  {{ controls.bedrooms.value }}
+                </p>
+              </div>
+
+              <div class="rounded-xl bg-slate-50 p-4">
+                <p class="text-xs text-slate-500">Bathrooms</p>
+                <p class="mt-1 text-lg font-black">
+                  {{ controls.bathrooms.value }}
+                </p>
+              </div>
+
+              <div class="rounded-xl bg-slate-50 p-4">
+                <p class="text-xs text-slate-500">Area</p>
+                <p class="mt-1 text-lg font-black">
+                  {{ controls.squareFeet.value || '—' }}
+                </p>
+                <p class="text-xs text-slate-500">sq. ft.</p>
+              </div>
+
+              <div class="rounded-xl bg-slate-50 p-4">
+                <p class="text-xs text-slate-500">Furnished</p>
+                <p class="mt-1 text-lg font-black">
+                  {{ controls.furnished.value ? 'Yes' : 'No' }}
+                </p>
+              </div>
+            </div>
+
+            <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div class="rounded-xl bg-slate-50 p-4">
+                <p class="text-xs text-slate-500">Shared property</p>
+                <p class="mt-1 font-bold">
+                  {{ controls.sharedProperty.value ? 'Yes' : 'No' }}
+                </p>
+              </div>
+
+              <div class="rounded-xl bg-slate-50 p-4">
+                <p class="text-xs text-slate-500">Vegetarian preference</p>
+                <p class="mt-1 font-bold">
+                  {{
+                    controls.vegetarianPreference.value === 'yes'
+                      ? 'Vegetarian only'
+                      : controls.vegetarianPreference.value === 'no'
+                        ? 'Non-vegetarian allowed'
+                        : 'No preference'
+                  }}
+                </p>
+              </div>
+
+              <div class="rounded-xl bg-slate-50 p-4">
+                <p class="text-xs text-slate-500">Negotiable rent</p>
+                <p class="mt-1 font-bold">
+                  {{ controls.negotiable.value ? 'Yes' : 'No' }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Amenities -->
+          <div>
+            <h3 class="text-lg font-extrabold">Amenities</h3>
+
+            <div
+              *ngIf="selectedAmenities.length > 0; else noAmenities"
+              class="mt-3 flex flex-wrap gap-2"
+            >
+              <span
+                *ngFor="let amenity of selectedAmenities"
+                class="rounded-full bg-green-50 px-3 py-2 text-sm font-semibold text-green-800"
+              >
+                ✓ {{ amenity }}
+              </span>
+            </div>
+
+            <ng-template #noAmenities>
+              <p class="mt-2 text-sm text-slate-500">
+                No amenities selected.
+              </p>
+            </ng-template>
+          </div>
+
+          <!-- All photos -->
+          <div *ngIf="photoUrls.length > 1">
+            <h3 class="text-lg font-extrabold">More photos</h3>
+
+            <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <img
+                *ngFor="let photo of photoUrls.slice(1)"
+                [src]="photo"
+                [alt]="controls.title.value || 'Property photo'"
+                class="h-36 w-full rounded-xl object-cover"
+                (error)="$any($event.target).src = defaultPropertyImage"
+              />
+            </div>
+          </div>
+
+          <!-- Contact details -->
+          <div>
+            <h3 class="text-lg font-extrabold">Contact details</h3>
+
+            <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div class="rounded-xl bg-slate-50 p-4">
+                <p class="text-xs text-slate-500">Contact name</p>
+                <p class="mt-1 break-words font-bold">
+                  {{ controls.contactName.value }}
+                </p>
+              </div>
+
+              <div class="rounded-xl bg-slate-50 p-4">
+                <p class="text-xs text-slate-500">Email</p>
+                <p class="mt-1 break-all font-bold">
+                  {{ controls.contactEmail.value }}
+                </p>
+              </div>
+
+              <div class="rounded-xl bg-slate-50 p-4">
+                <p class="text-xs text-slate-500">Phone</p>
+                <p class="mt-1 break-words font-bold">
+                  {{ controls.contactPhone.value }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit and submit actions -->
+        <div class="flex items-center justify-end gap-3 border-t border-slate-200 bg-slate-50 p-5 sm:gap-4 sm:px-8">
+          <button
+            type="button"
+            (click)="editDetails()"
+            class="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 hover:bg-slate-100 sm:px-8 sm:text-base"
+          >
+            ← Edit Details
+          </button>
+
+          <button
+            type="submit"
+            [disabled]="isSubmitting"
+            class="inline-flex min-h-12 items-center justify-center rounded-xl bg-green-700 px-5 py-3 text-sm font-bold text-white shadow-md hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-60 sm:px-8 sm:text-base"
+          >
+            {{
+              isSubmitting
+                ? 'Submitting...'
+                : isEditMode
+                  ? 'Submit Changes'
+                  : 'Submit Property'
+            }}
+          </button>
+        </div>
+      </section>
+    </form>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-12 border-t border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-7 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+      <p class="font-black text-blue-700">RentHub.</p>
+      <p>Make your next listing count.</p>
+    </div>
+  </footer>
+</div>

@@ -1,0 +1,31 @@
+/* Defines the registration component's layout behavior. */
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+/* Keeps sizing consistent across form elements. */
+* {
+  box-sizing: border-box;
+}
+
+/* Adds visual feedback when users focus on form inputs. */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Shows that buttons are interactive. */
+button:hover:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Makes disabled buttons visually distinct. */
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

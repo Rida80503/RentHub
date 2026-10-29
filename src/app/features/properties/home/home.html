@@ -1,0 +1,510 @@
+
+<div class="min-h-screen bg-slate-50 text-slate-800">
+
+  <!-- Navbar -->
+  <header class="sticky top-0 z-30 border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+      <a routerLink="/" class="text-2xl font-extrabold tracking-tight text-blue-700">
+        RentHub<span class="text-slate-900">.</span>
+      </a>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <a *ngIf="!isLoggedIn" routerLink="/login"
+          class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+          Login
+        </a>
+
+        <a *ngIf="!isLoggedIn" routerLink="/register"
+          class="rounded-lg bg-blue-700 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-800">
+          Get Started
+        </a>
+
+        <ng-container *ngIf="currentUser as user">
+          <button type="button"
+            (click)="toggleProfile()"
+            [attr.aria-expanded]="isProfileOpen"
+            aria-label="Open profile settings"
+            class="flex items-center gap-2 rounded-full border border-slate-200 py-1 pl-1 pr-3 hover:bg-slate-50">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-700 font-bold text-white">
+              {{ user.name.charAt(0).toUpperCase() }}
+            </span>
+            <span class="hidden text-left sm:block">
+              <span class="block max-w-32 truncate text-sm font-semibold">{{ user.name }}</span>
+              <span class="block text-xs capitalize text-slate-500">{{ user.role }}</span>
+            </span>
+            <span class="text-xs text-slate-500">⌄</span>
+          </button>
+
+          <button type="button" (click)="logout()"
+            class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-50">
+            Logout
+          </button>
+
+          <!-- Compact profile popup -->
+          <div *ngIf="isProfileOpen"
+            class="fixed inset-0 z-40 bg-black/20"
+            (click)="closeProfile()">
+
+            <section role="dialog" aria-modal="true" aria-label="Profile settings"
+              class="absolute right-3 top-20 max-h-[80vh] w-[calc(100%-1.5rem)] max-w-sm overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl sm:right-6"
+              (click)="$event.stopPropagation()">
+
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h2 class="text-lg font-extrabold text-slate-900">My Profile</h2>
+                  <p class="mt-1 text-xs text-slate-500">Manage your account details</p>
+                </div>
+                <button type="button" (click)="closeProfile()" aria-label="Close profile"
+                  class="flex h-8 w-8 items-center justify-center rounded-full text-xl text-slate-500 hover:bg-slate-100">
+                  ×
+                </button>
+              </div>
+
+              <p *ngIf="profileSuccess" role="status"
+                class="mt-4 rounded-lg bg-green-50 p-3 text-sm text-green-700">
+                {{ profileSuccess }}
+              </p>
+
+              <p *ngIf="profileError" role="alert"
+                class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                {{ profileError }}
+              </p>
+
+              <!-- View profile -->
+              <div *ngIf="!isEditingProfile" class="mt-5">
+                <div class="flex items-center gap-3">
+                  <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xl font-extrabold text-blue-700">
+                    {{ user.name.charAt(0).toUpperCase() }}
+                  </div>
+                  <div class="min-w-0">
+                    <p class="break-words font-bold text-slate-900">{{ user.name }}</p>
+                    <span class="mt-1 inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold capitalize text-blue-700">
+                      {{ user.role }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="mt-5 space-y-3">
+                  <div>
+                    <p class="text-xs text-slate-500">Email</p>
+                    <p class="mt-1 break-all text-sm font-medium text-slate-800">{{ user.email }}</p>
+                  </div>
+                  <div>
+                    <p class="text-xs text-slate-500">Phone</p>
+                    <p class="mt-1 text-sm font-medium text-slate-800">{{ user.phone || 'Not provided' }}</p>
+                  </div>
+                </div>
+
+                <button type="button" (click)="startEditingProfile()"
+                  class="mt-5 w-full rounded-xl bg-blue-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-800">
+                  Edit Profile
+                </button>
+              </div>
+
+              <!-- Edit profile -->
+              <form *ngIf="isEditingProfile" #profileForm="ngForm"
+                (ngSubmit)="saveProfile()" class="mt-5 space-y-4">
+
+                <div>
+                  <label for="homeProfileName" class="mb-1.5 block text-sm font-semibold text-slate-700">
+                    Full name
+                  </label>
+                  <input id="homeProfileName" name="homeProfileName" type="text"
+                    [(ngModel)]="profileName" #nameControl="ngModel"
+                    required pattern="^[A-Za-z]+( [A-Za-z]+)*$" maxlength="80"
+                    autocomplete="name"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                  <p *ngIf="nameControl.invalid && nameControl.touched" class="mt-1 text-xs text-red-600">
+                    Use English alphabets and spaces only.
+                  </p>
+                </div>
+
+                <div>
+                  <label for="homeProfileEmail" class="mb-1.5 block text-sm font-semibold text-slate-700">
+                    Email address
+                  </label>
+                  <input id="homeProfileEmail" name="homeProfileEmail" type="email"
+                    [(ngModel)]="profileEmail" #emailControl="ngModel"
+                    required email maxlength="254" autocomplete="email"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                  <p *ngIf="emailControl.invalid && emailControl.touched" class="mt-1 text-xs text-red-600">
+                    Enter a valid email, e.g. name@example.com.
+                  </p>
+                </div>
+
+                <div>
+                  <label for="homeProfilePhone" class="mb-1.5 block text-sm font-semibold text-slate-700">
+                    Phone number
+                  </label>
+                  <input id="homeProfilePhone" name="homeProfilePhone" type="tel"
+                    [(ngModel)]="profilePhone" #phoneControl="ngModel"
+                    required pattern="^[6-9][0-9]{9}$" minlength="10" maxlength="10"
+                    inputmode="numeric" autocomplete="tel" placeholder="9876543210"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" />
+                  <p *ngIf="phoneControl.invalid && phoneControl.touched" class="mt-1 text-xs text-red-600">
+                    Enter 10 digits starting with 6, 7, 8 or 9.
+                  </p>
+                </div>
+
+                <div>
+                  <p class="mb-1.5 text-sm font-semibold text-slate-700">Account role</p>
+                  <span class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-sm font-bold capitalize text-blue-700">
+                    {{ user.role }}
+                  </span>
+                  <p class="mt-1 text-xs text-slate-500">Role cannot be changed here.</p>
+                </div>
+
+                <div class="flex gap-2 pt-1">
+                  <button type="submit" [disabled]="profileForm.invalid"
+                    class="flex-1 rounded-lg bg-blue-700 px-3 py-2.5 text-sm font-bold text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50">
+                    Save Changes
+                  </button>
+                  <button type="button" (click)="cancelEditingProfile()"
+                    class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold hover:bg-slate-50">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </section>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero-section">
+      <div class="hero-overlay">
+        <div class="mx-auto max-w-7xl px-4 py-14 text-center sm:px-6 sm:py-20">
+          <p class="text-sm font-bold uppercase tracking-[0.2em] text-blue-200">Welcome to RentHub</p>
+          <h1 class="mt-4 text-3xl font-extrabold text-white sm:text-5xl">Find Your Perfect Rental</h1>
+          <p class="mt-4 text-lg text-slate-100">Discover rooms, apartments and houses that feel like home.</p>
+
+          <div class="mx-auto mt-8 flex max-w-3xl flex-col gap-3 sm:flex-row">
+            <input [(ngModel)]="searchLocation" (ngModelChange)="resetPage()"
+              name="heroLocation" type="search"
+              placeholder="Search location, e.g. Sector 62, Noida"
+              class="min-w-0 flex-1 rounded-xl border border-white/50 bg-white px-5 py-4 text-slate-900 outline-none focus:ring-4 focus:ring-blue-300/50" />
+            <button type="button" (click)="resetPage()"
+              class="rounded-xl bg-blue-700 px-7 py-4 font-bold text-white hover:bg-blue-800">
+              Search Properties
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+      <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+        <div class="mb-5 flex items-center justify-between gap-3">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">Find a property</h2>
+            <p class="mt-1 text-sm text-slate-500">Refine results using your preferences.</p>
+          </div>
+          <button type="button" (click)="clearFilters()"
+            class="text-sm font-semibold text-blue-700 hover:underline">
+            Clear filters
+          </button>
+        </div>
+
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div>
+            <label for="filterLocation" class="filter-label">Location</label>
+            <input id="filterLocation" [(ngModel)]="searchLocation" (ngModelChange)="resetPage()"
+              name="filterLocation" class="filter-input" placeholder="Enter location" />
+          </div>
+
+          <div>
+            <label for="filterType" class="filter-label">Property type</label>
+            <select id="filterType" [(ngModel)]="selectedType" (ngModelChange)="resetPage()"
+              name="filterType" class="filter-input">
+              <option value="">All types</option>
+              <option *ngFor="let type of propertyTypes" [value]="type">{{ type }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="minRent" class="filter-label">Minimum rent (₹)</label>
+            <input id="minRent" type="number" min="0" [(ngModel)]="minRent"
+              (ngModelChange)="resetPage()" name="minRent" class="filter-input" placeholder="No minimum" />
+          </div>
+
+          <div>
+            <label for="maxRent" class="filter-label">Maximum rent (₹)</label>
+            <input id="maxRent" type="number" min="0" [(ngModel)]="maxRent"
+              (ngModelChange)="resetPage()" name="maxRent" class="filter-input" placeholder="No maximum" />
+          </div>
+
+          <div>
+            <label for="bedrooms" class="filter-label">Minimum bedrooms</label>
+            <select id="bedrooms" [(ngModel)]="selectedBedrooms" (ngModelChange)="resetPage()"
+              name="bedrooms" class="filter-input">
+              <option value="">Any</option>
+              <option *ngFor="let bedrooms of bedroomOptions" [ngValue]="bedrooms">{{ bedrooms }}+</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="furnished" class="filter-label">Furnishing</label>
+            <select id="furnished" [(ngModel)]="furnishedFilter" (ngModelChange)="resetPage()"
+              name="furnished" class="filter-input">
+              <option value="all">All</option>
+              <option value="furnished">Furnished</option>
+              <option value="unfurnished">Unfurnished</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="vegetarian" class="filter-label">Vegetarian preference</label>
+            <select id="vegetarian" [(ngModel)]="vegetarianFilter" (ngModelChange)="resetPage()"
+              name="vegetarian" class="filter-input">
+              <option value="all">Any preference</option>
+              <option value="yes">Vegetarian only</option>
+              <option value="no">Non-vegetarian allowed</option>
+              <option value="no-preference">No preference</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="leaseType" class="filter-label">Lease type</label>
+            <select id="leaseType" [(ngModel)]="leaseFilter" (ngModelChange)="resetPage()"
+              name="leaseType" class="filter-input">
+              <option value="all">All lease types</option>
+              <option value="long-term">Long-term</option>
+              <option value="short-term">Short-term</option>
+              <option value="both">Flexible / both</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="sortBy" class="filter-label">Sort by</label>
+            <select id="sortBy" [(ngModel)]="sortBy" (ngModelChange)="resetPage()"
+              name="sortBy" class="filter-input">
+              <option value="newest">Newest first</option>
+              <option value="rentLow">Rent: low to high</option>
+              <option value="rentHigh">Rent: high to low</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-5">
+          <p class="filter-label">Amenities</p>
+          <div class="flex flex-wrap gap-x-5 gap-y-3">
+            <label *ngFor="let amenity of amenityOptions"
+              class="flex items-center gap-2 text-sm text-slate-700">
+              <input type="checkbox" [checked]="isAmenitySelected(amenity)"
+                (change)="toggleAmenity(amenity, $any($event.target).checked)"
+                class="h-4 w-4 rounded border-slate-300 text-blue-700" />
+              {{ amenity }}
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Listing tabs -->
+    <section class="mx-auto max-w-7xl px-4 pb-12 sm:px-6">
+      <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="text-sm font-semibold uppercase tracking-wider text-blue-700">Explore rentals</p>
+          <h2 class="mt-1 text-2xl font-extrabold text-slate-900">Available Properties</h2>
+          <p class="mt-2 text-sm text-slate-500">
+            Showing {{ showingFrom }}–{{ showingTo }} of {{ filteredProperties.length }} properties
+          </p>
+        </div>
+      </div>
+
+      <div class="mb-6 flex flex-wrap gap-2">
+        <button type="button" (click)="selectTab('all')"
+          [class.active-tab]="activeTab === 'all'" class="listing-tab">
+          All Properties
+        </button>
+        <button type="button" (click)="selectTab('featured')"
+          [class.active-tab]="activeTab === 'featured'" class="listing-tab">
+          Featured
+        </button>
+        <button type="button" (click)="selectTab('favourites')"
+          [class.active-tab]="activeTab === 'favourites'" class="listing-tab">
+          ♥ Favourites
+        </button>
+      </div>
+
+      <!-- Featured carousel -->
+      <div *ngIf="activeTab !== 'favourites' && currentFeaturedProperty as featured"
+        class="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="grid md:grid-cols-2">
+          <div class="relative h-64 bg-slate-100 md:min-h-[360px]">
+            <img [src]="getPropertyImage(featured)" [alt]="featured.title"
+              class="h-full w-full object-cover"
+              (error)="$any($event.target).src = defaultPropertyImage" />
+
+            <button type="button" (click)="toggleFavourite(featured)"
+              [attr.aria-label]="isFavourite(featured) ? 'Remove from favourites' : 'Add to favourites'"
+              [attr.aria-pressed]="isFavourite(featured)"
+              class="absolute right-3 top-3 flex h-12 w-12 items-center justify-center rounded-full bg-white text-3xl shadow-lg transition hover:scale-110 focus-visible:outline-2 focus-visible:outline-blue-600"
+              [class.text-red-600]="isFavourite(featured)"
+              [class.text-slate-500]="!isFavourite(featured)">
+              {{ isFavourite(featured) ? '♥' : '♡' }}
+            </button>
+          </div>
+
+          <div class="flex flex-col justify-center p-6 sm:p-8">
+            <span class="w-fit rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
+              Featured listing
+            </span>
+            <h3 class="mt-4 text-2xl font-extrabold text-slate-900">{{ featured.title }}</h3>
+            <p class="mt-2 text-slate-500">📍 {{ featured.location }}</p>
+            <p class="mt-4 text-3xl font-extrabold text-blue-700">
+              ₹{{ featured.rent | number }}
+              <span class="text-sm font-medium text-slate-500">/ month</span>
+            </p>
+            <p class="mt-3 line-clamp-2 text-sm leading-6 text-slate-600">{{ featured.description }}</p>
+
+            <div class="mt-6 flex flex-wrap gap-3">
+              <button type="button" (click)="previousFeatured()"
+                class="rounded-lg border border-slate-300 px-4 py-2 font-semibold hover:bg-slate-50">
+                Previous
+              </button>
+              <button type="button" (click)="nextFeatured()"
+                class="rounded-lg border border-slate-300 px-4 py-2 font-semibold hover:bg-slate-50">
+                Next
+              </button>
+              <button type="button" (click)="viewProperty(featured)"
+                class="rounded-lg bg-blue-700 px-5 py-2 font-semibold text-white hover:bg-blue-800">
+                View Details
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Property cards -->
+      <div *ngIf="paginatedProperties.length > 0; else noResults"
+        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <article *ngFor="let property of paginatedProperties"
+          class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+
+          <div class="relative h-56 bg-slate-100">
+            <img [src]="getPropertyImage(property)" [alt]="property.title"
+              class="h-full w-full object-cover" loading="lazy"
+              (error)="$any($event.target).src = defaultPropertyImage" />
+
+            <span class="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-xs font-bold text-blue-700 shadow">
+              {{ property.propertyType }}
+            </span>
+
+            <button type="button" (click)="toggleFavourite(property)"
+              [attr.aria-label]="isFavourite(property) ? 'Remove from favourites' : 'Add to favourites'"
+              [attr.aria-pressed]="isFavourite(property)"
+              class="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-white text-2xl shadow hover:scale-105"
+              [class.text-red-600]="isFavourite(property)"
+              [class.text-slate-500]="!isFavourite(property)">
+              {{ isFavourite(property) ? '♥' : '♡' }}
+            </button>
+          </div>
+
+          <div class="p-5">
+            <h3 class="truncate text-lg font-bold text-slate-900">{{ property.title }}</h3>
+            <p class="mt-2 text-sm text-slate-500">📍 {{ property.location }}</p>
+
+            <p class="mt-4 text-2xl font-extrabold text-blue-700">
+              ₹{{ property.rent | number }}
+              <span class="text-sm font-medium text-slate-500">/ month</span>
+            </p>
+
+            <div class="mt-4 flex flex-wrap gap-3 border-y border-slate-100 py-3 text-sm text-slate-600">
+              <span>🛏 {{ property.bedrooms }} beds</span>
+              <span>🛁 {{ property.bathrooms }} baths</span>
+              <span>{{ property.furnished ? 'Furnished' : 'Unfurnished' }}</span>
+            </div>
+
+            <p class="mt-4 line-clamp-2 text-sm leading-6 text-slate-600">
+              {{ property.description }}
+            </p>
+
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span *ngFor="let amenity of property.amenities.slice(0, 3)"
+                class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">
+                {{ amenity }}
+              </span>
+            </div>
+
+            <p class="mt-3 text-xs text-slate-500">
+              Vegetarian: {{
+                property.vegetarianPreference === 'yes'
+                  ? 'Vegetarian only'
+                  : property.vegetarianPreference === 'no'
+                    ? 'Non-vegetarian allowed'
+                    : 'No preference'
+              }}
+            </p>
+
+            <p class="mt-1 text-xs text-slate-500">
+              Lease: {{ property.leaseType || 'Not specified' }}
+            </p>
+
+            <div class="mt-5 grid grid-cols-2 gap-3">
+              <button type="button" (click)="viewProperty(property)"
+                class="rounded-lg border border-blue-200 px-3 py-3 text-sm font-semibold text-blue-700 hover:bg-blue-50">
+                View Details
+              </button>
+              <a [href]="'mailto:' + property.contactEmail"
+                class="rounded-lg bg-blue-700 px-3 py-3 text-center text-sm font-semibold text-white hover:bg-blue-800">
+                Contact
+              </a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Empty state -->
+      <ng-template #noResults>
+        <div class="rounded-2xl border-2 border-dashed border-slate-300 bg-white p-12 text-center">
+          <p class="text-xl font-bold text-slate-900">
+            {{ activeTab === 'favourites' ? 'No favourites saved yet' : 'No matching properties' }}
+          </p>
+          <p class="mt-2 text-sm text-slate-500">
+            {{ activeTab === 'favourites'
+              ? 'Use the heart on a property card to save it here.'
+              : 'Try changing your search or filters.'
+            }}
+          </p>
+          <button type="button" (click)="clearFilters()"
+            class="mt-5 rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white">
+            Clear filters
+          </button>
+        </div>
+      </ng-template>
+
+      <!-- Pagination -->
+      <nav *ngIf="filteredProperties.length > pageSize"
+        aria-label="Property listing pagination"
+        class="mt-10 flex flex-wrap items-center justify-center gap-2">
+        <button type="button" (click)="changePage(currentPage - 1)"
+          [disabled]="currentPage === 1" class="page-button">
+          Previous
+        </button>
+
+        <button *ngFor="let page of pageNumbers" type="button"
+          (click)="changePage(page)"
+          [class.current-page]="currentPage === page" class="page-button">
+          {{ page }}
+        </button>
+
+        <button type="button" (click)="changePage(currentPage + 1)"
+          [disabled]="currentPage === totalPages" class="page-button">
+          Next
+        </button>
+      </nav>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-200 bg-white">
+    <div class="mx-auto max-w-7xl px-4 py-6 text-center text-sm text-slate-500 sm:px-6">
+      © RentHub — Find a place that feels like home.
+    </div>
+  </footer>
+</div>

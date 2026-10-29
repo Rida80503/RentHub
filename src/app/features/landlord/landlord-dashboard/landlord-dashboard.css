@@ -1,0 +1,32 @@
+/* Makes the host component a block and fills at least the viewport height. */
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+/* Displays a pointer cursor over buttons. */
+button {
+  cursor: pointer;
+}
+
+/* Adds a visible focus outline for keyboard accessibility. */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}
+
+/* Prevents images from behaving like inline elements. */
+img {
+  display: block;
+}
+
+/* Restricts text to two lines and hides any overflow. */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+}

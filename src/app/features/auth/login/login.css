@@ -1,0 +1,34 @@
+/* Styles for the login page container */
+:host {
+  display: block;
+  min-height: 100%;
+}
+
+/* Ensures form elements use consistent sizing */
+* {
+  box-sizing: border-box;
+}
+
+/* Smooth transitions for interactive elements */
+button,
+input {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Highlights an input when the user focuses on it */
+input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Provides visual feedback when a button is hovered */
+button:hover {
+  cursor: pointer;
+}
+
+/* Shows a disabled state for form buttons */
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

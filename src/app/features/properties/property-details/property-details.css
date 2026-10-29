@@ -1,0 +1,33 @@
+/* Ensures the property details component fills at least the viewport height. */
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+/* Sets the height and placeholder background for the property image. */
+.property-image {
+  height: 18rem;
+  background: #e2e8f0;
+}
+
+/* Styles tiles that display property information, such as bedrooms and bathrooms. */
+.detail-tile {
+  display: flex;
+  min-height: 7rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+/* Provides a visible focus indicator for keyboard navigation. */
+button:focus-visible,
+a:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}

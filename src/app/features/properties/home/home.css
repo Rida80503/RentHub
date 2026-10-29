@@ -1,0 +1,133 @@
+/* Ensures the component fills at least the full viewport height. */
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+/* Sets the background image and positioning for the hero section. */
+.hero-section {
+  background-image: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1800&q=85');
+  background-position: center;
+  background-size: cover;
+}
+
+/* Adds a dark gradient over the hero image to improve text readability. */
+.hero-overlay {
+  background: linear-gradient(
+    90deg,
+    rgb(15 23 42 / 88%),
+    rgb(15 23 42 / 58%),
+    rgb(15 23 42 / 25%)
+  );
+}
+
+/* Styles labels above property search filters. */
+.filter-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+/* Provides consistent styling for property filter inputs. */
+.filter-input {
+  width: 100%;
+  min-height: 2.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.625rem;
+  background: #fff;
+  padding: 0.65rem 0.75rem;
+  color: #0f172a;
+  font-size: 0.875rem;
+}
+
+/* Highlights a filter input when it receives focus. */
+.filter-input:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+  border-color: #2563eb;
+}
+
+/* Defines the default appearance of listing filter tabs. */
+.listing-tab {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.625rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+  background: white;
+}
+
+/* Adds a subtle background change when hovering over a tab. */
+.listing-tab:hover {
+  background: #f8fafc;
+}
+
+/* Highlights the currently active listing tab. */
+.listing-tab.active-tab {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: white;
+}
+
+/* Defines the default appearance of pagination buttons. */
+.page-button {
+  min-width: 2.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+  background: white;
+}
+
+/* Adds hover feedback to enabled pagination buttons. */
+.page-button:hover:not(:disabled) {
+  background: #eff6ff;
+}
+
+/* Highlights the currently selected page number. */
+.page-button.current-page {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: white;
+}
+
+/* Indicates that a disabled pagination button cannot be used. */
+.page-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* Limits property descriptions to two lines and hides extra text. */
+.line-clamp-2 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* Shows a pointer cursor for interactive buttons and links. */
+button,
+a {
+  cursor: pointer;
+}
+
+/* Provides a visible focus indicator for keyboard navigation. */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 3px;
+}
+
+/* Makes images block-level and prevents them from exceeding their container. */
+img {
+  display: block;
+  max-width: 100%;
+}
